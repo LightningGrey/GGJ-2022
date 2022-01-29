@@ -39,7 +39,7 @@ public class PlayerControls : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed)
+        if (ctx.performed && isGrounded)
         {
             moveVec.y += Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
