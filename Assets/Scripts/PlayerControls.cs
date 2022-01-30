@@ -24,23 +24,29 @@ public class PlayerControls : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Collider2D pCollider;
 
-    [Header("Variables")] 
-    private Vector2 moveVec = Vector2.zero;
+    [Header("Variables")]
     [SerializeField] private float speed;
     [SerializeField] private float jumpHeight;
+    private Vector2 moveVec = Vector2.zero;
     private const float gravity = -9.8f;
 
     private PlayerState state = PlayerState.IDLE;
+
 
     // Start is called before the first frame update
     void Start()
     {
     }
 
+
+    void Update()
+    {
+        GroundCheck();
+    }
+
     // Update is called once per frame
     void FixedUpdate()
     {
-        GroundCheck();
         Movement();
     }
 
@@ -72,10 +78,12 @@ public class PlayerControls : MonoBehaviour
         if (hit.collider != null)
         {
             SetFlag(PlayerState.GROUNDED);
+            animator.SetBool("Air", false);
         }
         else
         {
             UnsetFlag(PlayerState.GROUNDED);
+            animator.SetBool("Air", true);
         }
 
     }
@@ -96,6 +104,9 @@ public class PlayerControls : MonoBehaviour
         {
             UnsetFlag(PlayerState.JUMPING);
         }
+
+        //Debug.Log(HasFlag(PlayerState.GROUNDED));
+        //Debug.Log(rb.velocity);
     }
 
 
