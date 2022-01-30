@@ -20,6 +20,7 @@ public class PlayerControls : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Rigidbody2D rb;
+   // [SerializeField] private SpriteRenderer sprite;
     [SerializeField] private Animator animator;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private Collider2D pCollider;
@@ -27,6 +28,7 @@ public class PlayerControls : MonoBehaviour
     [Header("Variables")]
     [SerializeField] private float speed;
     [SerializeField] private float jumpHeight;
+    //[SerializeField] private bool faceLeft;
     private Vector2 moveVec = Vector2.zero;
     private const float gravity = -9.8f;
 
@@ -60,9 +62,15 @@ public class PlayerControls : MonoBehaviour
     {
         if (ctx.performed && HasFlag(PlayerState.GROUNDED))
         {
-            UnsetFlag(PlayerState.GROUNDED);
             SetFlag(PlayerState.JUMPING);
-            moveVec.y += Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+            //ceiling check
+            RaycastHit2D hit = Physics2D.BoxCast(pCollider.bounds.center, 
+                pCollider.bounds.size, 0.0f, Vector2.up, 0.1f, groundLayer);
+            if (hit.collider == null)
+            {
+                moveVec.y += Mathf.Sqrt(jumpHeight * -2f * gravity);
+            }
         }
     }
 
@@ -85,7 +93,7 @@ public class PlayerControls : MonoBehaviour
             UnsetFlag(PlayerState.GROUNDED);
             animator.SetBool("Air", true);
         }
-
+        
     }
 
     void Movement()
@@ -95,7 +103,11 @@ public class PlayerControls : MonoBehaviour
            moveVec.y = 0.0f;
         }
 
-        moveVec.y += gravity * Time.fixedDeltaTime;
+        if (!HasFlag(PlayerState.GROUNDED))
+        {
+            moveVec.y += gravity * Time.fixedDeltaTime;
+        }
+
 
         rb.velocity = moveVec * speed;
 
@@ -105,8 +117,6 @@ public class PlayerControls : MonoBehaviour
             UnsetFlag(PlayerState.JUMPING);
         }
 
-        //Debug.Log(HasFlag(PlayerState.GROUNDED));
-        //Debug.Log(rb.velocity);
     }
 
 
@@ -116,11 +126,20 @@ public class PlayerControls : MonoBehaviour
         {
             if (gameObject == GameManager.Instance.p1)
             {
-                GameManager.Instance.GameOver();
+                GameManager.Instance.GameOverCheck(true);
+            }
+        } else if (col.gameObject.layer == 8)
+        {
+            RaycastHit2D hit = Physics2D.BoxCast(pCollider.bounds.center,
+                pCollider.bounds.size, 0.0f, Vector2.up, 0.1f, groundLayer);
+            if (!HasFlag(PlayerState.GROUNDED) && hit)
+            {
+                //ceiling collisions
+                moveVec.y = 0.0f;
+                UnsetFlag(PlayerState.JUMPING);
             }
         }
     }
-
 
     #region Enum flag functions
 
