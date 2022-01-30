@@ -78,9 +78,6 @@ public class PlayerControls : MonoBehaviour
             UnsetFlag(PlayerState.GROUNDED);
         }
 
-        
-        Debug.Log(HasFlag(PlayerState.GROUNDED));
-
     }
 
     void Movement()
@@ -98,6 +95,18 @@ public class PlayerControls : MonoBehaviour
         if (!HasFlag(PlayerState.GROUNDED) && HasFlag(PlayerState.JUMPING))
         {
             UnsetFlag(PlayerState.JUMPING);
+        }
+    }
+
+
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        if (col.gameObject.CompareTag("Player"))
+        {
+            if (gameObject == GameManager.Instance.p1)
+            {
+                GameManager.Instance.GameOver();
+            }
         }
     }
 
