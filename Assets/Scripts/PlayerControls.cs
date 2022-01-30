@@ -28,8 +28,10 @@ public class PlayerControls : MonoBehaviour
     [Header("Variables")]
     [SerializeField] private float speed;
     [SerializeField] private float jumpHeight;
-    //[SerializeField] private bool faceLeft;
-    private Vector2 moveVec = Vector2.zero;
+
+    [HideInInspector] public Vector2 moveVec = Vector2.zero;
+
+
     private const float gravity = -9.8f;
 
     private PlayerState state = PlayerState.IDLE;
@@ -62,15 +64,20 @@ public class PlayerControls : MonoBehaviour
     {
         if (ctx.performed && HasFlag(PlayerState.GROUNDED))
         {
-            SetFlag(PlayerState.JUMPING);
+            JumpAction(jumpHeight);
+        }
+    }
 
-            //ceiling check
-            RaycastHit2D hit = Physics2D.BoxCast(pCollider.bounds.center, 
-                pCollider.bounds.size, 0.0f, Vector2.up, 0.1f, groundLayer);
-            if (hit.collider == null)
-            {
-                moveVec.y += Mathf.Sqrt(jumpHeight * -2f * gravity);
-            }
+    public void JumpAction(float _jumpHeight)
+    {
+        SetFlag(PlayerState.JUMPING);
+
+        //ceiling check
+        RaycastHit2D hit = Physics2D.BoxCast(pCollider.bounds.center,
+            pCollider.bounds.size, 0.0f, Vector2.up, 0.1f, groundLayer);
+        if (hit.collider == null)
+        {
+            moveVec.y += Mathf.Sqrt(_jumpHeight * -2f * gravity);
         }
     }
 

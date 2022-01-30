@@ -31,9 +31,13 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     [SerializeField] public GameObject p1;
     [SerializeField] public GameObject p2;
+    [SerializeField] public GameObject winCanvas;
+
 
     private Vector3 p1InitialPos;
     private Vector3 p2InitialPos;
+
+    public int win = 0;
 
 
     // Start is called before the first frame update
@@ -55,6 +59,15 @@ public class GameManager : MonoBehaviour
         if (check || (Mathf.Abs(p1.transform.position.x - p2.transform.position.x) < 0.5f))
         {
             StartCoroutine(GameOverSequence());
+        }
+    }
+
+    public void WinCheck()
+    {
+        win++;
+        if (win >= 2)
+        {
+            winCanvas.SetActive(true);
         }
     }
 
