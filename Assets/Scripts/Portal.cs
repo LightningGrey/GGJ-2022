@@ -26,14 +26,16 @@ public class Portal : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.gameObject.CompareTag("Player")){
-
+        if (col.gameObject.CompareTag("Player"))
+        {
             if (linkedPortal != null && enableWarp)
             {
                 col.gameObject.transform.position = linkedPortal.transform.position;
-                col.gameObject.GetComponent<PlayerControls>().moveVec.y = 0.0f;
+                col.gameObject.GetComponent<Rigidbody2D>().velocity = 
+                    new Vector2(col.gameObject.GetComponent<Rigidbody2D>().velocity.x, 0.0f);
                 linkedPortal.GetComponent<Portal>().enableWarp = false;
-            } else if (col.gameObject == endPlayer)
+            } 
+            else if (col.gameObject == endPlayer)
             {
                 col.gameObject.SetActive(false);
                 GameManager.Instance.WinCheck();

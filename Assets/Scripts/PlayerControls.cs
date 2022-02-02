@@ -26,13 +26,10 @@ public class PlayerControls : MonoBehaviour
     [SerializeField] private Collider2D pCollider;
 
     [Header("Variables")]
-    [SerializeField] private float speed;
-    [SerializeField] private float jumpHeight;
+    [SerializeField] private float speed = 0.0f;
+    [SerializeField] private float jumpHeight = 0.0f;
 
-    [HideInInspector] public Vector2 moveVec = Vector2.zero;
-
-
-    private const float gravity = -9.8f;
+    [HideInInspector] private Vector2 moveVec = Vector2.zero;
 
     private PlayerState state = PlayerState.IDLE;
 
@@ -46,6 +43,12 @@ public class PlayerControls : MonoBehaviour
     void Update()
     {
         GroundCheck();
+
+        //unset flag when player lands
+        if (!HasFlag(PlayerState.GROUNDED) && HasFlag(PlayerState.JUMPING))
+        {
+            UnsetFlag(PlayerState.JUMPING);
+        }
     }
 
     // Update is called once per frame
@@ -64,22 +67,11 @@ public class PlayerControls : MonoBehaviour
     {
         if (ctx.performed && HasFlag(PlayerState.GROUNDED))
         {
-            JumpAction(jumpHeight);
+            SetFlag(PlayerState.JUMPING);
+            rb.velocity = jumpHeight * Vector2.up;
         }
     }
 
-    public void JumpAction(float _jumpHeight)
-    {
-        SetFlag(PlayerState.JUMPING);
-
-        //ceiling check
-        RaycastHit2D hit = Physics2D.BoxCast(pCollider.bounds.center,
-            pCollider.bounds.size, 0.0f, Vector2.up, 0.1f, groundLayer);
-        if (hit.collider == null)
-        {
-            moveVec.y += Mathf.Sqrt(_jumpHeight * -2f * gravity);
-        }
-    }
 
     public void OnAttack()
     {
@@ -105,25 +97,7 @@ public class PlayerControls : MonoBehaviour
 
     void Movement()
     {
-        if (HasFlag(PlayerState.GROUNDED) && !HasFlag(PlayerState.JUMPING))
-        {
-           moveVec.y = 0.0f;
-        }
-
-        if (!HasFlag(PlayerState.GROUNDED))
-        {
-            moveVec.y += gravity * Time.fixedDeltaTime;
-        }
-
-
-        rb.velocity = moveVec * speed;
-
-        //unset flag when player lands
-        if (!HasFlag(PlayerState.GROUNDED) && HasFlag(PlayerState.JUMPING))
-        {
-            UnsetFlag(PlayerState.JUMPING);
-        }
-
+        rb.velocity = new Vector2(moveVec.x * speed, rb.velocity.y);
     }
 
 
@@ -134,16 +108,6 @@ public class PlayerControls : MonoBehaviour
             if (gameObject == GameManager.Instance.p1)
             {
                 GameManager.Instance.GameOverCheck(true);
-            }
-        } else if (col.gameObject.layer == 8)
-        {
-            RaycastHit2D hit = Physics2D.BoxCast(pCollider.bounds.center,
-                pCollider.bounds.size, 0.0f, Vector2.up, 0.1f, groundLayer);
-            if (!HasFlag(PlayerState.GROUNDED) && hit)
-            {
-                //ceiling collisions
-                moveVec.y = 0.0f;
-                UnsetFlag(PlayerState.JUMPING);
             }
         }
     }

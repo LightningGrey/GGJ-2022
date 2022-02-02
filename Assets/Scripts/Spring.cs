@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Spring : MonoBehaviour
-{
+{ 
+    [Header("Variables")]
+    [SerializeField] private float boostHeight = 0.0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,8 +24,7 @@ public class Spring : MonoBehaviour
     {
         if (col.gameObject.CompareTag("Player"))
         {
-            PlayerControls player = col.gameObject.GetComponent<PlayerControls>();
-            player.JumpAction(0.9f);
+            col.gameObject.GetComponent<Rigidbody2D>().velocity = boostHeight * Vector2.up;
         }
     }
 }
